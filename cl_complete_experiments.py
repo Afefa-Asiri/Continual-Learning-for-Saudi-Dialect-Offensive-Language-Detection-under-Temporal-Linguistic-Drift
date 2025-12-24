@@ -230,7 +230,7 @@ def clear_memory():
     gc.collect()
     if torch.cuda.is_available():
         torch.cuda.empty_cache()
-    print("🧹 Memory cleared")
+    print(" Memory cleared")
 
 def set_seed(seed):
     """Set random seeds for reproducibility"""
@@ -1283,7 +1283,7 @@ def generate_all_tables(original_results, main_results, hybrid_results,
 
             # Mark optimal
             if lora_r == optimal_lora_rank:
-                row['Config'] = f"r={lora_r} ⭐"
+                row['Config'] = f"r={lora_r} "
 
             table6_data.append(row)
             print(f"{row['Config']:<12} | {row['Params']:<12} | {row['Historical F1']:<18} | {row['Contemporary F1']:<18} | {row['BWT']:<15}")
@@ -1291,8 +1291,8 @@ def generate_all_tables(original_results, main_results, hybrid_results,
     pd.DataFrame(table6_data).to_csv(f'{TABLES_DIR}/table6_lora_ablation.csv', index=False)
 
     print(f"\n{'='*80}")
-    print(f"✅ ALL 6 TABLES GENERATED AND DISPLAYED ABOVE")
-    print(f"✅ Tables saved to: {TABLES_DIR}/")
+    print(f" ALL 6 TABLES GENERATED AND DISPLAYED ABOVE")
+    print(f" Tables saved to: {TABLES_DIR}/")
     print(f"{'='*80}")
 
     return table1_data, table2_data, table3_data, table4_data, table5_data, table6_data
@@ -1331,7 +1331,7 @@ def generate_all_figures(original_results, main_results, hybrid_results,
     # ========================================
     # FIGURE 1: F1-Macro Bar Chart
     # ========================================
-    print("\n📊 [1/8] Creating Figure 1: F1-Macro Bar Chart...")
+    print("\n [1/8] Creating Figure 1: F1-Macro Bar Chart...")
 
     fig, ax = plt.subplots(figsize=(14, 6))
 
@@ -1377,7 +1377,7 @@ def generate_all_figures(original_results, main_results, hybrid_results,
     # ========================================
     # FIGURE 2: BWT vs FWT Scatter
     # ========================================
-    print("\n📊 [2/8] Creating Figure 2: BWT vs FWT Scatter Plot...")
+    print("\n [2/8] Creating Figure 2: BWT vs FWT Scatter Plot...")
 
     fig, ax = plt.subplots(figsize=(10, 8))
 
@@ -1421,7 +1421,7 @@ def generate_all_figures(original_results, main_results, hybrid_results,
     # ========================================
     # FIGURE 3: Parameter Efficiency
     # ========================================
-    print("\n📊 [3/8] Creating Figure 3: Parameter Efficiency...")
+    print("\n [3/8] Creating Figure 3: Parameter Efficiency...")
 
     fig, axes = plt.subplots(1, 2, figsize=(14, 5))
 
@@ -1486,7 +1486,7 @@ def generate_all_figures(original_results, main_results, hybrid_results,
     # ========================================
     # FIGURE 4: Training Time
     # ========================================
-    print("\n📊 [4/8] Creating Figure 4: Training Time Comparison...")
+    print("\n [4/8] Creating Figure 4: Training Time Comparison...")
 
     fig, ax = plt.subplots(figsize=(12, 6))
 
@@ -1517,7 +1517,7 @@ def generate_all_figures(original_results, main_results, hybrid_results,
     # ========================================
     # FIGURE 5: Loss Curves
     # ========================================
-    print("\n📊 [5/8] Creating Figure 5: Loss Curves...")
+    print("\n [5/8] Creating Figure 5: Loss Curves...")
 
     fig, axes = plt.subplots(1, 2, figsize=(14, 5))
 
@@ -1584,7 +1584,7 @@ def generate_all_figures(original_results, main_results, hybrid_results,
     # ========================================
     # FIGURE 6: LoRA Ablation
     # ========================================
-    print("\n📊 [6/8] Creating Figure 6: LoRA Ablation Study...")
+    print("\n [6/8] Creating Figure 6: LoRA Ablation Study...")
 
     fig, axes = plt.subplots(1, 2, figsize=(12, 5))
 
@@ -1642,7 +1642,7 @@ def generate_all_figures(original_results, main_results, hybrid_results,
     # ========================================
     # FIGURE 7 (A1): Confusion Matrices 9×4
     # ========================================
-    print("\n📊 [7/8] Creating Figure A1: Comprehensive Confusion Matrices (9×4)...")
+    print("\n [7/8] Creating Figure A1: Comprehensive Confusion Matrices (9×4)...")
 
     fig, axes = plt.subplots(9, 4, figsize=(18, 28))
 
@@ -1688,7 +1688,7 @@ def generate_all_figures(original_results, main_results, hybrid_results,
     # ========================================
     # FIGURE 8 (A2): All Methods on Contemporary
     # ========================================
-    print("\n📊 [8/8] Creating Figure A2: All Methods Confusion Matrices (3×3)...")
+    print("\n [8/8] Creating Figure A2: All Methods Confusion Matrices (3×3)...")
 
     fig, axes = plt.subplots(3, 3, figsize=(14, 12))
     axes = axes.flatten()
@@ -1725,8 +1725,8 @@ def generate_all_figures(original_results, main_results, hybrid_results,
     save_figure(fig, 'Figure_A2_Confusion_Matrix_All9')
 
     print(f"\n{'='*80}")
-    print(f"✅ ALL 8 FIGURES GENERATED AND DISPLAYED ABOVE")
-    print(f"✅ Figures saved to: {FIGURES_DIR}/")
+    print(f" ALL 8 FIGURES GENERATED AND DISPLAYED ABOVE")
+    print(f" Figures saved to: {FIGURES_DIR}/")
     print(f"{'='*80}")
 
 # ============================================================================
@@ -1749,7 +1749,7 @@ def main():
 
     create_directories()
 
-    print("\n📥 Loading tokenizer...")
+    print("\n Loading tokenizer...")
     tokenizer = load_local_tokenizer(MODEL_PATH)
     print("✓ Tokenizer loaded")
 
@@ -1810,13 +1810,13 @@ def main():
     # PRINT COMPREHENSIVE FINAL SUMMARY
     # ========================================
     print("\n" + "="*80)
-    print("   ✅ ALL EXPERIMENTS COMPLETED SUCCESSFULLY!")
+    print("    ALL EXPERIMENTS COMPLETED SUCCESSFULLY!")
     print("="*80)
 
-    print(f"\n⏱️ Finished at: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+    print(f"\n Finished at: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
 
     print(f"\n{'='*80}")
-    print("🏆 FINAL RESULTS SUMMARY")
+    print(" FINAL RESULTS SUMMARY")
     print(f"{'='*80}")
 
     print(f"\n🔧 Configuration:")
@@ -1825,7 +1825,7 @@ def main():
     print(f"   • Seeds Used: {SEEDS}")
     print(f"   • LoRA Ranks Tested: {LORA_RANKS_TO_TEST}")
 
-    print(f"\n📊 Original Model Baseline:")
+    print(f"\n Original Model Baseline:")
     print(f"   • Historical F1: {original_f1_historical:.4f}")
     print(f"   • Contemporary F1: {original_f1_contemporary:.4f}")
 
@@ -1835,7 +1835,7 @@ def main():
     all_final_results.update(hybrid_results)
 
     print(f"\n{'='*80}")
-    print("📋 FINAL PERFORMANCE TABLE (F1-Macro)")
+    print(" FINAL PERFORMANCE TABLE (F1-Macro)")
     print(f"{'='*80}")
     print(f"\n{'Method':<15} | {'Historical':<12} | {'Contemporary':<12} | {'BWT':<12} | {'FWT':<12}")
     print(f"{'-'*70}")
@@ -1861,7 +1861,7 @@ def main():
 
     # Find best methods
     print(f"\n{'='*80}")
-    print("🥇 BEST METHODS BY METRIC")
+    print(" BEST METHODS BY METRIC")
     print(f"{'='*80}")
 
     best_bwt_method = None
@@ -1896,14 +1896,14 @@ def main():
             best_balance = balance
             best_balance_method = method
 
-    print(f"\n   🏆 Best Knowledge Retention (BWT): {METHOD_LABELS_SHORT.get(best_bwt_method, best_bwt_method)} ({best_bwt:+.4f})")
-    print(f"   🏆 Best Adaptation (FWT): {METHOD_LABELS_SHORT.get(best_fwt_method, best_fwt_method)} ({best_fwt:+.4f})")
-    print(f"   🏆 Best Balance (BWT+FWT): {METHOD_LABELS_SHORT.get(best_balance_method, best_balance_method)} ({best_balance:+.4f})")
+    print(f"\n    Best Knowledge Retention (BWT): {METHOD_LABELS_SHORT.get(best_bwt_method, best_bwt_method)} ({best_bwt:+.4f})")
+    print(f"    Best Adaptation (FWT): {METHOD_LABELS_SHORT.get(best_fwt_method, best_fwt_method)} ({best_fwt:+.4f})")
+    print(f"    Best Balance (BWT+FWT): {METHOD_LABELS_SHORT.get(best_balance_method, best_balance_method)} ({best_balance:+.4f})")
 
     print(f"\n{'='*80}")
-    print("📁 OUTPUT FILES")
+    print(" OUTPUT FILES")
     print(f"{'='*80}")
-    print(f"\n   📊 Figures (8): {FIGURES_DIR}/")
+    print(f"\n    Figures (8): {FIGURES_DIR}/")
     print(f"      • Figure_1_F1_Comparison.png/.pdf")
     print(f"      • Figure_2_BWT_FWT.png/.pdf")
     print(f"      • Figure_3_Parameter_Efficiency.png/.pdf")
@@ -1912,19 +1912,19 @@ def main():
     print(f"      • Figure_6_LoRA_Ablation.png/.pdf")
     print(f"      • Figure_A1_Confusion_Matrix_9x4.png/.pdf")
     print(f"      • Figure_A2_Confusion_Matrix_All9.png/.pdf")
-    print(f"\n   📋 Tables (6): {TABLES_DIR}/")
+    print(f"\n    Tables (6): {TABLES_DIR}/")
     print(f"      • table1_f1_macro.csv")
     print(f"      • table2_accuracy.csv")
     print(f"      • table3_bwt_fwt.csv")
     print(f"      • table4_per_class_f1.csv")
     print(f"      • table5_training_time.csv")
     print(f"      • table6_lora_ablation.csv")
-    print(f"\n   📄 JSON Results: {OUTPUT_DIR}/")
+    print(f"\n    JSON Results: {OUTPUT_DIR}/")
     print(f"      • all_results_final.json")
     print(f"      • lora_ablation_summary.json")
 
     print(f"\n{'='*80}")
-    print("   🎉 EXPERIMENT COMPLETE! 🎉")
+    print("    EXPERIMENT COMPLETE! ")
     print(f"{'='*80}\n")
 
     return {
