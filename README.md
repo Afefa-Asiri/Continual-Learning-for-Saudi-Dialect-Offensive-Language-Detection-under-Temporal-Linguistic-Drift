@@ -99,4 +99,4 @@ If you use this code in academic work, please cite the paper associated with thi
 
 ## License
 
-Add a license file (e.g., MIT) if you plan to make this repository publicly reusable.
+This repository is released under the **MIT License**, which permits reuse, modification, and distribution for research and academic purposes, provided that the original authors are credited. See the `LICENSE` file for full details.
