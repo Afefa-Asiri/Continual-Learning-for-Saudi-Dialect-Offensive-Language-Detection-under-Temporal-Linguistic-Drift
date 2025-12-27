@@ -1,6 +1,5 @@
 # Continual Learning for Saudi Dialect Offensive Language Detection under Temporal Linguistic Drift
 
-
 This repository provides the implementation code for our paper on **continual learning** for **Saudi dialect offensive language detection** under **temporal linguistic drift**.
 
 ## Abstract
@@ -10,13 +9,11 @@ Offensive language detection systems degrade over time as linguistic patterns ev
 ## Repository Contents
 
 ```
-├── CL_Experiments.ipynb    # Main experiment notebook (Google Colab)
+├── CL_Experiments.py       # Main experiment script
 ├── requirements.txt        # Python dependencies
 ├── README.md              # This file
 └── LICENSE                # License file
 ```
-
-
 
 ## Experiment Structure
 
@@ -84,5 +81,3 @@ If you use this code in your research, please cite:
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-
