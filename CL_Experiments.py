@@ -106,8 +106,8 @@ MAX_LENGTH = 128                  # Maximum sequence length
 BATCH_SIZE = 32                   # Batch size
 LEARNING_RATE = 2e-5              # Learning rate
 EPOCHS = 5                        # Training epochs
-CLASS_WEIGHT_0 = 1.0              # Weight for non-offensive class
-CLASS_WEIGHT_1 = 2.0              # Weight for offensive class
+#CLASS_WEIGHT_0 = 1.0              # Weight for non-offensive class
+#CLASS_WEIGHT_1 = 2.0              # Weight for offensive class
 
 TOTAL_MODEL_PARAMS = 135_000_000  # AraBERT ~ 135M parameters
 
