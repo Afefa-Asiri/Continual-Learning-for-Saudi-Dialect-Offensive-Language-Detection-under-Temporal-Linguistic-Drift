@@ -1,6 +1,5 @@
 # Continual Learning for Saudi Dialect Offensive Language Detection under Temporal Linguistic Drift
 
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Afefa-Asiri/Continual-Learning-for-Saudi-Dialect-Offensive-Language-Detection-under-Temporal-Linguistic-Drift/blob/main/CL_Experiments.ipynb)
 
 This repository provides the implementation code for our paper on **continual learning** for **Saudi dialect offensive language detection** under **temporal linguistic drift**.
 
