@@ -8,12 +8,12 @@ This script implements the complete experiment pipeline for evaluating
 continual learning methods on Saudi dialect offensive language detection.
 
 EXPERIMENT STRUCTURE:
-  Phase 1: LoRA Ablation Study (4 ranks × 5 seeds = 20 runs)
-  Phase 2: Main CL Experiments (8 methods × 5 seeds = 40 runs)
+  Phase 1: LoRA Ablation Study (4 ranks x 5 seeds = 20 runs)
+  Phase 2: Main CL Experiments (8 methods x 5 seeds = 40 runs)
 
 METHODS EVALUATED:
   - Original (baseline)
-  - Naïve Fine-tuning
+  - Naive Fine-tuning
   - Experience Replay (ER)
   - Elastic Weight Consolidation (EWC)
   - LoRA (with optimal rank from ablation)
@@ -21,6 +21,14 @@ METHODS EVALUATED:
   - LoRA + EWC
   - LoRA + ER + EWC
   - Full + ER + EWC
+
+FIGURES GENERATED:
+  - Figure 1: Performance comparison (grouped bar chart)
+  - Figure 2: KR vs AG trade-off scatter plot
+  - Figure 3: Parameter efficiency analysis (2 panels)
+  - Figure 4: Training time comparison
+  - Figure A1: Confusion matrices (9 methods x 4 test sets)
+  - Figure B1: LoRA rank ablation study
 
 USAGE:
   1. Update the paths in the CONFIGURATION section
@@ -137,7 +145,7 @@ METHOD_COLORS = {
 }
 
 METHOD_NAMES = {
-    'original': 'Original', 'naive_ft': 'Naïve FT',
+    'original': 'Original', 'naive_ft': 'Naive FT',
     'er': 'ER', 'ewc': 'EWC', 'lora': 'LoRA',
     'lora+er': 'LoRA+ER', 'lora+ewc': 'LoRA+EWC',
     'lora+er+ewc': 'LoRA+ER+EWC', 'full+er+ewc': 'Full+ER+EWC',
@@ -210,14 +218,14 @@ def clear_memory():
 
 
 def fmt_mean_std(values, decimals=4):
-    """Format mean ± std string."""
+    """Format mean +/- std string."""
     values = [v for v in values if v is not None and not np.isnan(v)]
     if not values:
         return "N/A"
     m, s = np.mean(values), np.std(values)
     if len(values) == 1:
         return f"{m:.{decimals}f}"
-    return f"{m:.{decimals}f} ± {s:.{decimals}f}"
+    return f"{m:.{decimals}f} +/- {s:.{decimals}f}"
 
 
 # ============================================================================
@@ -281,7 +289,7 @@ class EWC:
 class EWCTrainer(Trainer):
     """
     Custom Trainer with EWC regularization and class weights.
-    Uses the correct EWC formula: loss + (λ/2) * penalty
+    Uses the correct EWC formula: loss + (lambda/2) * penalty
     """
     
     def __init__(self, *args, ewc=None, ewc_lambda=0.0, class_weights=None, **kwargs):
@@ -302,7 +310,7 @@ class EWCTrainer(Trainer):
 
         loss = loss_fct(logits, labels)
 
-        # EWC regularization: loss + (λ/2) * penalty
+        # EWC regularization: loss + (lambda/2) * penalty
         if self.ewc is not None and self.ewc_lambda > 0:
             loss = loss + (self.ewc_lambda / 2) * self.ewc.penalty(model)
 
@@ -365,7 +373,7 @@ def evaluate_original_model(test_datasets: Dict, tokenizer) -> Tuple[Dict, Dict]
     del model, trainer
     clear_memory()
     
-    print("✓ Original model evaluation complete")
+    print("[OK] Original model evaluation complete")
     return results, predictions
 
 
@@ -441,7 +449,7 @@ def train_method(
             task_type=TaskType.SEQ_CLS
         )
         model = get_peft_model(model, peft_config)
-        print(f"  LoRA: r={lora_config['r']}, α={lora_config['alpha']}")
+        print(f"  LoRA: r={lora_config['r']}, alpha={lora_config['alpha']}")
         model.print_trainable_parameters()
 
     # Count parameters
@@ -459,7 +467,7 @@ def train_method(
         ewc_ds.set_format(type='torch', columns=['input_ids', 'attention_mask', 'labels'])
         ewc_loader = DataLoader(ewc_ds, batch_size=BATCH_SIZE, shuffle=False)
         ewc = EWC(model, ewc_loader, device)
-        print("  ✓ EWC Fisher computed")
+        print("  [OK] EWC Fisher computed")
 
     # Training
     class_weights = torch.tensor([CLASS_WEIGHT_0, CLASS_WEIGHT_1], dtype=torch.float32)
@@ -515,7 +523,7 @@ def train_method(
         predictions[f'{test_name}_preds'] = np.argmax(pred_output.predictions, axis=1)
         predictions[f'{test_name}_labels'] = pred_output.label_ids
 
-    print(f"✓ Completed in {training_time:.1f}s")
+    print(f"[OK] Completed in {training_time:.1f}s")
 
     del model, trainer
     clear_memory()
@@ -532,7 +540,7 @@ def run_lora_ablation(original_df, new_df, test_datasets, tokenizer):
     
     print("\n" + "="*80)
     print("PHASE 1: LoRA ABLATION STUDY")
-    print("Testing 4 ranks × 5 seeds = 20 runs")
+    print("Testing 4 ranks x 5 seeds = 20 runs")
     print("="*80)
 
     ablation_results = {}
@@ -541,7 +549,7 @@ def run_lora_ablation(original_df, new_df, test_datasets, tokenizer):
     for variant in LORA_ABLATION_VARIANTS:
         variant_name = variant["name"]
         print(f"\n{'#'*60}")
-        print(f"LoRA Rank: {variant_name} (r={variant['r']}, α={variant['alpha']})")
+        print(f"LoRA Rank: {variant_name} (r={variant['r']}, alpha={variant['alpha']})")
         print(f"{'#'*60}")
 
         ablation_results[variant_name] = []
@@ -586,7 +594,7 @@ def run_lora_ablation(original_df, new_df, test_datasets, tokenizer):
             best_score = balanced_score
             best_variant = variant
 
-    print(f"\n✓ OPTIMAL RANK: {best_variant['name']} (Balanced: {best_score:.4f})")
+    print(f"\n[OK] OPTIMAL RANK: {best_variant['name']} (Balanced: {best_score:.4f})")
     
     return ablation_results, ablation_params, best_variant
 
@@ -734,9 +742,9 @@ def generate_all_tables(all_results, training_times, convergence_metrics, params
         if method not in convergence_metrics:
             continue
         if method == 'original':
-            table5_rows.append({'Method': 'Original', 'Final Train Loss': '—', 
-                               'Best Val Loss': '—', 'Final Val Loss': '—',
-                               'Trainable Params': '—', 'Time (s)': '—'})
+            table5_rows.append({'Method': 'Original', 'Final Train Loss': '-', 
+                               'Best Val Loss': '-', 'Final Val Loss': '-',
+                               'Trainable Params': '-', 'Time (s)': '-'})
             continue
 
         conv_list = convergence_metrics[method]
@@ -751,8 +759,8 @@ def generate_all_tables(all_results, training_times, convergence_metrics, params
             'Final Train Loss': fmt_mean_std([v for v in final_train if v and not np.isnan(v)]),
             'Best Val Loss': fmt_mean_std([v for v in best_val if v and not np.isnan(v)]),
             'Final Val Loss': fmt_mean_std([v for v in final_val if v and not np.isnan(v)]),
-            'Trainable Params': f"{params:,}" if params else '—',
-            'Time (s)': fmt_mean_std(times, 1) if times else '—'
+            'Trainable Params': f"{params:,}" if params else '-',
+            'Time (s)': fmt_mean_std(times, 1) if times else '-'
         })
 
     table5 = pd.DataFrame(table5_rows)
@@ -776,7 +784,7 @@ def generate_all_tables(all_results, training_times, convergence_metrics, params
         cont_vals = [r['contemporary']['eval_f1_macro'] for r in results_list]
         kr_vals = [h - orig_hist for h in hist_vals]
         
-        is_optimal = "✓" if name == optimal_lora_config["name"] else ""
+        is_optimal = "[*]" if name == optimal_lora_config["name"] else ""
         
         tableB1_rows.append({
             'Rank': name, 'Parameters': f"{params:,}",
@@ -789,7 +797,7 @@ def generate_all_tables(all_results, training_times, convergence_metrics, params
     print(tableB1.to_string(index=False))
     tableB1.to_csv(os.path.join(TABLES_DIR, 'TableB1_LoRA_Ablation.csv'), index=False)
 
-    print(f"\n✓ All tables saved to: {TABLES_DIR}")
+    print(f"\n[OK] All tables saved to: {TABLES_DIR}")
     
     return orig_hist, orig_cont
 
@@ -800,7 +808,7 @@ def generate_all_tables(all_results, training_times, convergence_metrics, params
 
 def generate_figure_1(all_results):
     """Figure 1: Performance bar charts."""
-    print("\n📊 Generating Figure 1: Performance Comparison...")
+    print("\nGenerating Figure 1: Performance Comparison...")
     
     test_sets = ['historical', 'contemporary', 'mixed_2080', 'mixed_4060']
     methods = METHODS_ORDER
@@ -830,18 +838,18 @@ def generate_figure_1(all_results):
     ax.legend(loc='upper right', fontsize=10)
     ax.yaxis.grid(True, linestyle='--', alpha=0.7)
     ax.set_axisbelow(True)
-    plt.title('Figure 1. Performance Comparison (mean ± std, 5 seeds)', fontsize=13, fontweight='bold')
+    plt.title('Figure 1. Performance Comparison (mean +/- std, 5 seeds)', fontsize=13, fontweight='bold')
     plt.tight_layout()
     
     fig_path = os.path.join(FIGURES_DIR, 'Figure_1_Performance.png')
     plt.savefig(fig_path, dpi=300, bbox_inches='tight', facecolor='white')
     plt.close()
-    print(f"✓ Saved: {fig_path}")
+    print(f"[OK] Saved: {fig_path}")
 
 
 def generate_figure_2(all_results, orig_hist, orig_cont):
     """Figure 2: KR vs AG scatter plot."""
-    print("\n📊 Generating Figure 2: KR vs AG Trade-off...")
+    print("\nGenerating Figure 2: KR vs AG Trade-off...")
     
     fig, ax = plt.subplots(figsize=(10, 8))
     markers = {'naive_ft': 'o', 'er': 's', 'ewc': '^', 'lora': 'D', 
@@ -875,12 +883,144 @@ def generate_figure_2(all_results, orig_hist, orig_cont):
     fig_path = os.path.join(FIGURES_DIR, 'Figure_2_KR_AG_Tradeoff.png')
     plt.savefig(fig_path, dpi=300, bbox_inches='tight', facecolor='white')
     plt.close()
-    print(f"✓ Saved: {fig_path}")
+    print(f"[OK] Saved: {fig_path}")
+
+
+def generate_figure_3(all_results, params_dict):
+    """Figure 3: Parameter Efficiency (two panels)."""
+    print("\nGenerating Figure 3: Parameter Efficiency...")
+    
+    fig, axes = plt.subplots(1, 2, figsize=(12, 5))
+    methods_to_plot = ['naive_ft', 'er', 'ewc', 'lora', 'lora+er', 'lora+ewc', 'lora+er+ewc', 'full+er+ewc']
+    
+    for ax, (test_set, title) in zip(axes, [
+        ('historical', 'Historical F1 (Knowledge Retention)'),
+        ('contemporary', 'Contemporary F1 (Adaptation)')
+    ]):
+        for method in methods_to_plot:
+            if method not in all_results:
+                continue
+            vals = [r[test_set]['eval_f1_macro'] for r in all_results[method]]
+            mean_f1 = np.mean(vals)
+            std_f1 = np.std(vals) if len(vals) > 1 else 0.0
+            params = params_dict.get(method, TOTAL_MODEL_PARAMS)
+            pct = (params / TOTAL_MODEL_PARAMS) * 100
+            
+            ax.errorbar(pct, mean_f1, yerr=std_f1, marker='o', markersize=10,
+                       color=METHOD_COLORS.get(method, 'gray'),
+                       label=METHOD_NAMES.get(method, method), capsize=4, linewidth=2)
+        
+        ax.set_xlabel('Trainable Parameters (%)', fontsize=11, fontweight='bold')
+        ax.set_ylabel('F1-macro', fontsize=11, fontweight='bold')
+        ax.set_title(title, fontsize=12, fontweight='bold')
+        ax.set_xscale('log')
+        ax.set_ylim(0.70, 1.0)
+        ax.grid(True, linestyle='--', alpha=0.5)
+        ax.legend(loc='lower right', fontsize=8)
+    
+    plt.suptitle('Figure 3. Parameter Efficiency: Retention vs Adaptation Trade-off',
+                 fontsize=13, fontweight='bold')
+    plt.tight_layout(rect=[0, 0, 1, 0.95])
+    
+    fig_path = os.path.join(FIGURES_DIR, 'Figure_3_ParamEfficiency.png')
+    plt.savefig(fig_path, dpi=300, bbox_inches='tight', facecolor='white')
+    plt.close()
+    print(f"[OK] Saved: {fig_path}")
+
+
+def generate_figure_4(training_times):
+    """Figure 4: Training Time Comparison."""
+    print("\nGenerating Figure 4: Training Time...")
+    
+    methods = [m for m in METHODS_ORDER if m != 'original' and m in training_times]
+    
+    fig, ax = plt.subplots(figsize=(10, 6))
+    
+    names, means, stds, colors_list = [], [], [], []
+    for method in methods:
+        times = training_times[method]
+        names.append(METHOD_NAMES.get(method, method))
+        means.append(np.mean(times))
+        stds.append(np.std(times) if len(times) > 1 else 0.0)
+        colors_list.append(METHOD_COLORS.get(method, COLORS['gray']))
+    
+    x_pos = np.arange(len(names))
+    ax.bar(x_pos, means, yerr=stds, capsize=4, color=colors_list,
+           edgecolor='black', linewidth=0.5, alpha=0.85)
+    
+    ax.set_ylabel('Training Time (seconds)', fontsize=12, fontweight='bold')
+    ax.set_xticks(x_pos)
+    ax.set_xticklabels(names, rotation=0, ha='center', fontsize=10)
+    ax.yaxis.grid(True, linestyle='--', alpha=0.7)
+    ax.set_axisbelow(True)
+    
+    plt.title('Figure 4. Training Time Comparison (mean +/- std, 5 seeds)', fontsize=13, fontweight='bold')
+    plt.tight_layout()
+    
+    fig_path = os.path.join(FIGURES_DIR, 'Figure_4_TrainingTime.png')
+    plt.savefig(fig_path, dpi=300, bbox_inches='tight', facecolor='white')
+    plt.close()
+    print(f"[OK] Saved: {fig_path}")
+
+
+def generate_figure_A1(all_predictions):
+    """Figure A1: Confusion Matrices (9 methods x 4 test sets)."""
+    print("\nGenerating Figure A1: Confusion Matrices...")
+    
+    test_sets = ['historical', 'contemporary', 'mixed_2080', 'mixed_4060']
+    methods = METHODS_ORDER
+    
+    fig, axes = plt.subplots(9, 4, figsize=(16, 36))
+    
+    for row_idx, method in enumerate(methods):
+        for col_idx, test_set in enumerate(test_sets):
+            ax = axes[row_idx, col_idx]
+            
+            preds_key = f'{test_set}_preds'
+            labels_key = f'{test_set}_labels'
+            
+            if method in all_predictions and preds_key in all_predictions[method]:
+                preds = all_predictions[method][preds_key]
+                labels = all_predictions[method][labels_key]
+                
+                cm = confusion_matrix(labels, preds)
+                acc = accuracy_score(labels, preds) * 100
+                
+                sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', ax=ax,
+                           xticklabels=['Non-Off', 'Offensive'],
+                           yticklabels=['Non-Off', 'Offensive'],
+                           cbar=False, annot_kws={'size': 11})
+                
+                if row_idx == 0:
+                    ax.set_title(f'{TEST_SET_NAMES[test_set]}\nAcc: {acc:.1f}%',
+                                fontsize=12, fontweight='bold')
+                else:
+                    ax.set_title(f'Acc: {acc:.1f}%', fontsize=11)
+                
+                if col_idx == 0:
+                    ax.set_ylabel(f'{METHOD_NAMES.get(method, method)}\n\nActual',
+                                 fontsize=11, fontweight='bold')
+                else:
+                    ax.set_ylabel('Actual', fontsize=10)
+                
+                ax.set_xlabel('Predicted', fontsize=10)
+            else:
+                ax.axis('off')
+                ax.text(0.5, 0.5, 'No Data', ha='center', va='center', fontsize=12)
+    
+    plt.suptitle('Figure A1. Confusion Matrix Analysis: All Methods x All Test Sets\n(Seed 101)',
+                 fontsize=16, fontweight='bold', y=1.01)
+    plt.tight_layout()
+    
+    fig_path = os.path.join(FIGURES_DIR, 'Figure_A1_ConfusionMatrices.png')
+    plt.savefig(fig_path, dpi=300, bbox_inches='tight', facecolor='white')
+    plt.close()
+    print(f"[OK] Saved: {fig_path}")
 
 
 def generate_figure_B1(ablation_results, optimal_lora_config):
     """Figure B1: LoRA Rank Ablation."""
-    print("\n📊 Generating Figure B1: LoRA Ablation...")
+    print("\nGenerating Figure B1: LoRA Ablation...")
     
     fig, axes = plt.subplots(1, 2, figsize=(12, 5))
     ranks = [8, 16, 32, 64]
@@ -919,7 +1059,7 @@ def generate_figure_B1(ablation_results, optimal_lora_config):
     fig_path = os.path.join(FIGURES_DIR, 'Figure_B1_LoRA_Ablation.png')
     plt.savefig(fig_path, dpi=300, bbox_inches='tight', facecolor='white')
     plt.close()
-    print(f"✓ Saved: {fig_path}")
+    print(f"[OK] Saved: {fig_path}")
 
 
 # ============================================================================
@@ -936,12 +1076,12 @@ def main():
     print(f"  Seeds: {SEEDS}")
     print(f"  Learning Rate: {LEARNING_RATE}")
     print(f"  Epochs: {EPOCHS}")
-    print(f"  EWC λ: {EWC_LAMBDA}")
+    print(f"  EWC lambda: {EWC_LAMBDA}")
     print(f"  Replay Buffer: {REPLAY_SAMPLES} samples")
     print(f"  Device: {'CUDA' if torch.cuda.is_available() else 'CPU'}")
 
     # Load datasets
-    print("\n📥 Loading datasets...")
+    print("\nLoading datasets...")
     original_df = load_dataset_csv(ORIGINAL_DS)
     new_df = load_dataset_csv(NEW_DS)
     historical_df = load_dataset_csv(HISTORICAL_TEST)
@@ -949,24 +1089,24 @@ def main():
     mixed_2080_df = load_dataset_csv(MIXED_2080_TEST)
     mixed_4060_df = load_dataset_csv(MIXED_4060_TEST)
 
-    print(f"✓ Original SOD: {len(original_df)} samples")
-    print(f"✓ New (NEW_DS): {len(new_df)} samples")
-    print(f"✓ Test sets: Hist={len(historical_df)}, Cont={len(contemporary_df)}, "
+    print(f"[OK] Original SOD: {len(original_df)} samples")
+    print(f"[OK] New (NEW_DS): {len(new_df)} samples")
+    print(f"[OK] Test sets: Hist={len(historical_df)}, Cont={len(contemporary_df)}, "
           f"M80-20={len(mixed_2080_df)}, M40-60={len(mixed_4060_df)}")
 
     # Load tokenizer
-    print("\n📥 Loading tokenizer...")
+    print("\nLoading tokenizer...")
     tokenizer = AutoTokenizer.from_pretrained(MODEL_PATH)
-    print("✓ Tokenizer loaded")
+    print("[OK] Tokenizer loaded")
 
     # Prepare test datasets
-    print("\n📥 Preparing test datasets...")
+    print("\nPreparing test datasets...")
     test_datasets = {}
     for name, df in [('historical', historical_df), ('contemporary', contemporary_df),
                      ('mixed_2080', mixed_2080_df), ('mixed_4060', mixed_4060_df)]:
         ds = prepare_test_dataset(df)
         test_datasets[name] = ds.map(lambda x: tokenize_function(x, tokenizer), batched=True)
-    print("✓ Test datasets ready")
+    print("[OK] Test datasets ready")
 
     # Evaluate Original Model
     original_results, original_predictions = evaluate_original_model(test_datasets, tokenizer)
@@ -997,14 +1137,24 @@ def main():
     print("="*80)
     generate_figure_1(all_results)
     generate_figure_2(all_results, orig_hist, orig_cont)
+    generate_figure_3(all_results, params_dict)
+    generate_figure_4(training_times)
+    generate_figure_A1(all_predictions)
     generate_figure_B1(ablation_results, optimal_lora_config)
 
     # Summary
     print("\n" + "="*80)
-    print("✅ ALL EXPERIMENTS COMPLETE!")
+    print("ALL EXPERIMENTS COMPLETE!")
     print("="*80)
-    print(f"\n📁 Results saved to: {RESULTS_DIR}")
-    print(f"🏆 Optimal LoRA rank: {optimal_lora_config['name']}")
+    print(f"\nResults saved to: {RESULTS_DIR}")
+    print(f"Optimal LoRA rank: {optimal_lora_config['name']}")
+    print("\nFigures generated:")
+    print("  - Figure 1: Performance Comparison")
+    print("  - Figure 2: KR vs AG Trade-off")
+    print("  - Figure 3: Parameter Efficiency")
+    print("  - Figure 4: Training Time")
+    print("  - Figure A1: Confusion Matrices")
+    print("  - Figure B1: LoRA Ablation")
 
 
 if __name__ == "__main__":
