@@ -16,22 +16,7 @@ Offensive language detection systems degrade over time as linguistic patterns ev
 └── LICENSE                # License file
 ```
 
-## Quick Start (Google Colab)
 
-1. **Click the "Open in Colab" badge** above
-2. **Upload your data files** to Google Drive:
-   ```
-   /content/drive/MyDrive/CL_Experiment/data/
-   ├── SOD_AraBERT_model/          # Pre-trained SOD_AraBERT checkpoint
-   ├── SDOffensive_Paper2.csv      # Original SOD training data (2019-2022)
-   ├── Paper2_DS_Complete.csv      # New training data (2024-2025)
-   ├── processed500UnseenDS_Paper2.csv  # Historical test set
-   ├── Balanced500_Paper2.csv      # Contemporary test set
-   ├── TestDS2080_Paper2.csv       # Mixed 80-20 test set
-   └── TestDS4060_Paper2.csv       # Mixed 40-60 test set
-   ```
-3. **Update the paths** in the Configuration section
-4. **Run all cells**
 
 ## Experiment Structure
 
@@ -100,7 +85,4 @@ If you use this code in your research, please cite:
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## Contact
 
-- **Afefa Asiri** - aasiri0410@stu.kau.edu.sa
-- Faculty of Computing and Information Technology, King Abdulaziz University
